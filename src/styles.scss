@@ -1,1 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
+* { margin: 0; box-sizing: border-box; }
+body { font-family: system-ui, -apple-system, sans-serif; }
+
+.hero {
+  min-height: 100vh;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  gap: 1rem;
+  background: #0a0a0f;
+  color: #e5e5e5;
+}
+.hero h1 { font-size: clamp(3rem, 10vw, 7rem); letter-spacing: -0.03em; }
+.hero p  { color: #8a8a8a; font-size: 1.1rem; }
