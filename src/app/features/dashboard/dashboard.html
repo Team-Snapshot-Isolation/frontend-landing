@@ -1,0 +1,41 @@
+<div class="dash">
+  <header class="dash__top">
+    <div>
+      <span class="eyebrow">Panel</span>
+      <h1>Tu base de datos</h1>
+    </div>
+    <button class="btn btn--ghost" (click)="salir()">Cerrar sesión</button>
+  </header>
+
+  <div class="dash__grid">
+    <section class="panel">
+      <h2>Datos de conexión</h2>
+      <dl class="rows">
+        <div><dt>Host</dt><dd>{{ db().host }}</dd></div>
+        <div><dt>Puerto</dt><dd>{{ db().puerto }}</dd></div>
+        <div><dt>Base de datos</dt><dd>{{ db().nombre }}</dd></div>
+        <div><dt>Usuario</dt><dd>{{ db().usuario }}</dd></div>
+        <div><dt>Contraseña</dt><dd>{{ db().clave }}</dd></div>
+        <div><dt>Motor</dt><dd>{{ db().motor }}</dd></div>
+      </dl>
+    </section>
+
+    <section class="panel">
+      <h2>Estado</h2>
+      <p class="estado"><span class="dot"></span> {{ db().estado }}</p>
+      <dl class="rows">
+        <div><dt>Creada</dt><dd>{{ db().creada }}</dd></div>
+        <div><dt>Última actividad</dt><dd>{{ db().ultimaActividad }}</dd></div>
+      </dl>
+      <div class="uso">
+        <div class="uso__head">
+          <span>Espacio usado</span>
+          <span>{{ db().usadoMb }} / {{ db().maxMb }} MB</span>
+        </div>
+        <div class="bar">
+          <div class="bar__fill" [style.width.%]="(db().usadoMb / db().maxMb) * 100"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

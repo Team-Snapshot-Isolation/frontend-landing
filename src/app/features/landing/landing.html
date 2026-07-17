@@ -1,0 +1,130 @@
+<header class="nav">
+  <a class="brand" href="#"><span class="brand__mark">◈</span> Snapshot</a>
+  <nav class="nav__links">
+    <a href="#como">Cómo funciona</a>
+    <a href="#docs">Documentación</a>
+    <a class="btn btn--ghost" routerLink="/login">Entrar</a>
+  </nav>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero__glow" aria-hidden="true"></div>
+
+    <div class="hero__copy reveal">
+      <span class="eyebrow">Base de datos como servicio · Gratis</span>
+      <h1 class="hero__title">Tu base de datos <span class="grad">MySQL</span>,<br>lista en segundos.</h1>
+      <p class="hero__sub">Inicia sesión con Google o GitHub y recibe al instante una base MySQL con sus credenciales.
+        Sin instalaciones, sin tarjeta.</p>
+      <div class="hero__cta">
+        <a class="btn btn--primary" routerLink="/login" [queryParams]="{ modo: 'registro' }">Crear cuenta gratis</a>
+        <a class="btn btn--ghost" routerLink="/login">Iniciar sesión</a>
+      </div>
+      <span class="hero__note">No pedimos tarjeta de crédito.</span>
+    </div>
+
+    <!-- Elemento estrella: lo que el producto entrega -->
+    <div class="card-db reveal" style="animation-delay: .15s" aria-hidden="true">
+      <div class="card-db__bar">
+        <span>snapshot://provision</span>
+        <span>MySQL 8.0</span>
+      </div>
+      <div class="card-db__status"><span class="dot"></span> Activa</div>
+      <dl class="card-db__rows">
+        <div>
+          <dt>host</dt>
+          <dd>db.snapshot.andrescortes.dev</dd>
+        </div>
+        <div>
+          <dt>puerto</dt>
+          <dd>3306</dd>
+        </div>
+        <div>
+          <dt>base</dt>
+          <dd>db_luis_a1b2</dd>
+        </div>
+        <div>
+          <dt>usuario</dt>
+          <dd>luis_a1b2</dd>
+        </div>
+        <div>
+          <dt>clave</dt>
+          <dd>••••••••••••<span class="caret"></span></dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- MÉTRICAS -->
+  <section class="metrics">
+    @for (m of metricas(); track m.etiqueta) {
+    <article class="metric reveal">
+      <span class="metric__val">{{ m.valor }}</span>
+      <span class="metric__lbl">{{ m.etiqueta }}</span>
+    </article>
+    }
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="section-head">
+      <span class="eyebrow">Todo incluido</span>
+      <h2>Lo que obtienes</h2>
+    </div>
+    <div class="features__grid">
+      @for (f of features(); track f.titulo) {
+      <article class="feature">
+        <h3>{{ f.titulo }}</h3>
+        <p>{{ f.texto }}</p>
+      </article>
+      }
+    </div>
+  </section>
+
+  <!-- CÓMO FUNCIONA -->
+  <section class="steps" id="como">
+    <div class="section-head">
+      <span class="eyebrow">En 3 pasos</span>
+      <h2>Cómo funciona</h2>
+    </div>
+    <div class="steps__grid">
+      @for (p of pasos(); track p.n) {
+      <article class="step">
+        <span class="step__n">{{ p.n }}</span>
+        <h3>{{ p.titulo }}</h3>
+        <p>{{ p.texto }}</p>
+      </article>
+      }
+    </div>
+  </section>
+
+  <!-- SEGURIDAD -->
+  <section class="security">
+    <h2>Seguro desde el primer clic</h2>
+    <ul class="security__list">
+      <li>OAuth2 con Google y GitHub</li>
+      <li>Conexiones cifradas con HTTPS</li>
+      <li>Contraseñas guardadas de forma segura</li>
+      <li>Consultas siempre parametrizadas</li>
+    </ul>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section class="cta">
+    <div class="cta__glow" aria-hidden="true"></div>
+    <h2>Crea tu base de datos gratis</h2>
+    <p>Tardas menos en tenerla que en leer esta frase.</p>
+    <a class="btn btn--primary" routerLink="/login" [queryParams]="{ modo: 'registro' }">Empezar ahora</a>
+  </section>
+</main>
+
+<footer class="footer">
+  <span class="brand"><span class="brand__mark">◈</span> Snapshot</span>
+  <div class="footer__links">
+    <a href="#docs">Documentación</a>
+    <a href="#">GitHub</a>
+    <a href="#">Estado</a>
+  </div>
+  <span class="footer__copy">© 2026 · Team Snapshot Isolation</span>
+</footer>

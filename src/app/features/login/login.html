@@ -1,0 +1,27 @@
+<div class="login">
+  <div class="login__card reveal">
+    <a class="brand" routerLink="/"><span class="brand__mark">◈</span> Snapshot</a>
+
+    <div class="tabs">
+      <button class="tab" [class.tab--active]="modo() === 'login'" (click)="setModo('login')">Iniciar sesión</button>
+      <button class="tab" [class.tab--active]="modo() === 'registro'" (click)="setModo('registro')">Crear cuenta</button>
+    </div>
+
+    @if (modo() === 'login') {
+      <h1>Bienvenido de nuevo</h1>
+      <p class="login__sub">Entra con tu cuenta y accede a tu base de datos.</p>
+    } @else {
+      <h1>Crea tu cuenta gratis</h1>
+      <p class="login__sub">Regístrate y te aprovisionamos una base MySQL al instante.</p>
+    }
+
+    <div class="login__providers">
+      <button class="btn btn--github" (click)="continuarCon('github')">Continuar con GitHub</button>
+      <button class="btn btn--google" (click)="continuarCon('google')">Continuar con Google</button>
+    </div>
+
+    <p class="login__legal">Al continuar te conectas de forma segura con OAuth2. No guardamos tu contraseña.</p>
+
+    <a class="login__back" routerLink="/">← Volver al inicio</a>
+  </div>
+</div>
