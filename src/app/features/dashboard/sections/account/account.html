@@ -1,0 +1,19 @@
+<div class="section-head">
+  <span class="eyebrow">Perfil</span>
+  <h1>Mi cuenta</h1>
+</div>
+
+<section class="card">
+  <div class="account__head">
+    <img class="account__avatar" [src]="usuario().avatar" [alt]="usuario().nombre">
+    <div>
+      <h2 class="account__name">{{ usuario().nombre }}</h2>
+      <span class="account__mail">{{ usuario().email }}</span>
+    </div>
+  </div>
+  <dl class="meta">
+    <div><dt>Proveedor de acceso</dt><dd>{{ usuario().proveedor }}</dd></div>
+    <div><dt>Miembro desde</dt><dd>{{ usuario().creada }}</dd></div>
+    <div><dt>Bases de datos activas</dt><dd>{{ bases().length }}</dd></div>
+  </dl>
+</section>

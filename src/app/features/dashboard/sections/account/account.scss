@@ -1,0 +1,8 @@
+.account__head { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.6rem; padding-bottom: 1.6rem; border-bottom: 1px solid var(--border); }
+.account__avatar { width: 64px; height: 64px; border-radius: 50%; border: 1px solid var(--border); }
+.account__name { font-family: var(--font-display); font-size: 1.4rem; }
+.account__mail { color: var(--muted); font-size: .9rem; }
+.meta { display: grid; gap: .8rem; }
+.meta div { display: flex; justify-content: space-between; font-size: .92rem; }
+.meta dt { color: var(--muted); }
+.meta dd { color: var(--text); }

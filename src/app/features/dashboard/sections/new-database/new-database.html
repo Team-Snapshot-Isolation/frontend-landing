@@ -1,0 +1,45 @@
+<div class="section-head">
+  <span class="eyebrow">Aprovisionar</span>
+  <h1>Nueva base de datos</h1>
+</div>
+
+<section class="card form-card">
+  <p class="intro">Creamos una base MySQL con su usuario y contraseña. Estará lista en segundos.</p>
+
+  <label class="label" for="nombre">Nombre de la base de datos</label>
+  <div class="input-wrap">
+    <span class="prefix">db_luis_</span>
+    <input
+      id="nombre"
+      class="input"
+      type="text"
+      placeholder="mi_proyecto"
+      [(ngModel)]="nombre"
+      [disabled]="creando()"
+      (keyup.enter)="crear()"
+    >
+  </div>
+  <p class="hint">Solo minúsculas, números y guion bajo. Entre 3 y 30 caracteres.</p>
+
+  @if (error()) {
+    <p class="error-msg">{{ error() }}</p>
+  }
+
+  <button class="btn btn--primary create-btn" (click)="crear()" [disabled]="creando()">
+    @if (creando()) {
+      <span class="spinner"></span> Creando tu base de datos…
+    } @else {
+      Crear base de datos
+    }
+  </button>
+</section>
+
+<section class="card info-card">
+  <h2 class="card__title">Qué incluye</h2>
+  <ul class="perks">
+    <li>Motor MySQL 8.0</li>
+    <li>20 MB de almacenamiento</li>
+    <li>Usuario y contraseña generados automáticamente</li>
+    <li>Acceso aislado solo a tu base</li>
+  </ul>
+</section>

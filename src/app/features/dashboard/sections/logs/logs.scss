@@ -1,0 +1,8 @@
+.log { display: flex; align-items: center; justify-content: space-between; padding: .9rem 0; border-bottom: 1px solid var(--border); }
+.log:last-child { border-bottom: none; }
+.log__left { display: flex; flex-direction: column; gap: .2rem; }
+.log__provider { font-weight: 600; font-size: .92rem; }
+.log__device { font-size: .8rem; color: var(--muted); }
+.log__right { display: flex; flex-direction: column; align-items: flex-end; gap: .2rem; }
+.log__ip { font-family: var(--font-mono); font-size: .82rem; color: var(--muted); }
+.log__date { font-size: .8rem; color: var(--muted); }

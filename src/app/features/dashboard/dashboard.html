@@ -1,41 +1,37 @@
-<div class="dash">
-  <header class="dash__top">
-    <div>
-      <span class="eyebrow">Panel</span>
-      <h1>Tu base de datos</h1>
-    </div>
-    <button class="btn btn--ghost" (click)="salir()">Cerrar sesión</button>
-  </header>
+<div class="shell">
+  <aside class="sidebar">
+    <a class="brand" routerLink="/"><span class="brand__mark">◈</span> Snapshot</a>
 
-  <div class="dash__grid">
-    <section class="panel">
-      <h2>Datos de conexión</h2>
-      <dl class="rows">
-        <div><dt>Host</dt><dd>{{ db().host }}</dd></div>
-        <div><dt>Puerto</dt><dd>{{ db().puerto }}</dd></div>
-        <div><dt>Base de datos</dt><dd>{{ db().nombre }}</dd></div>
-        <div><dt>Usuario</dt><dd>{{ db().usuario }}</dd></div>
-        <div><dt>Contraseña</dt><dd>{{ db().clave }}</dd></div>
-        <div><dt>Motor</dt><dd>{{ db().motor }}</dd></div>
-      </dl>
-    </section>
+    <nav class="menu">
+      <a class="menu__item" routerLink="/dashboard/database" routerLinkActive="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
+        Base de datos
+      </a>
+      <a class="menu__item" routerLink="/dashboard/account" routerLinkActive="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        Mi cuenta
+      </a>
+      <a class="menu__item" routerLink="/dashboard/logs" routerLinkActive="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        Inicios de sesión
+      </a>
+    </nav>
 
-    <section class="panel">
-      <h2>Estado</h2>
-      <p class="estado"><span class="dot"></span> {{ db().estado }}</p>
-      <dl class="rows">
-        <div><dt>Creada</dt><dd>{{ db().creada }}</dd></div>
-        <div><dt>Última actividad</dt><dd>{{ db().ultimaActividad }}</dd></div>
-      </dl>
-      <div class="uso">
-        <div class="uso__head">
-          <span>Espacio usado</span>
-          <span>{{ db().usadoMb }} / {{ db().maxMb }} MB</span>
-        </div>
-        <div class="bar">
-          <div class="bar__fill" [style.width.%]="(db().usadoMb / db().maxMb) * 100"></div>
-        </div>
+    <a class="new-btn" routerLink="/dashboard/new" routerLinkActive="active">+ Nueva base de datos</a>
+
+    <div class="sidebar__foot">
+      <img class="avatar" [src]="usuario().avatar" [alt]="usuario().nombre">
+      <div class="sidebar__user">
+        <span class="sidebar__name">{{ usuario().nombre }}</span>
+        <span class="sidebar__mail">{{ usuario().email }}</span>
       </div>
-    </section>
-  </div>
+      <button class="logout" (click)="salir()" title="Cerrar sesión">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
 </div>

@@ -1,0 +1,68 @@
+<div class="section-head">
+  <span class="eyebrow">Tus bases de datos</span>
+  <h1>Base de datos</h1>
+</div>
+
+<p class="count">{{ bases().length }} {{ bases().length === 1 ? 'base activa' : 'bases activas' }}</p>
+
+@for (b of bases(); track b.id) {
+  <section class="db-card">
+    <!-- Cabecera (clic para expandir) -->
+    <div class="db-card__head" (click)="toggle(b.id)">
+      <div class="db-card__title">
+        <span class="dot"></span>
+        <div>
+          <span class="db-card__name">{{ b.nombre }}</span>
+          <span class="db-card__meta">{{ b.motor }} · {{ b.estado }}</span>
+        </div>
+      </div>
+      <div class="db-card__right">
+        <div class="mini-uso">
+          <div class="mini-bar"><div class="mini-bar__fill" [style.width.%]="(b.usadoMb / b.maxMb) * 100"></div></div>
+          <span>{{ b.usadoMb }}/{{ b.maxMb }} MB</span>
+        </div>
+        <span class="chevron" [class.chevron--open]="expandidoId() === b.id">▾</span>
+      </div>
+    </div>
+
+    <!-- Detalle (se expande) -->
+    @if (expandidoId() === b.id) {
+      <div class="db-card__body">
+        <div class="fields">
+          <div class="field">
+            <span class="field__label">Host</span>
+            <span class="field__value">{{ b.host }}</span>
+            <button class="copy" (click)="copiar(b.host, 'host')">{{ copiado() === 'host' ? '¡Copiado!' : 'Copiar' }}</button>
+          </div>
+          <div class="field">
+            <span class="field__label">Puerto</span>
+            <span class="field__value">{{ b.puerto }}</span>
+            <button class="copy" (click)="copiar(b.puerto.toString(), 'puerto')">{{ copiado() === 'puerto' ? '¡Copiado!' : 'Copiar' }}</button>
+          </div>
+          <div class="field">
+            <span class="field__label">Usuario</span>
+            <span class="field__value">{{ b.usuario }}</span>
+            <button class="copy" (click)="copiar(b.usuario, 'usuario')">{{ copiado() === 'usuario' ? '¡Copiado!' : 'Copiar' }}</button>
+          </div>
+          <div class="field">
+            <span class="field__label">Contraseña</span>
+            <span class="field__value">{{ claveVisible() ? b.clave : '••••••••••••' }}</span>
+            <button class="icon-btn" (click)="claveVisible.set(!claveVisible())">{{ claveVisible() ? 'Ocultar' : 'Mostrar' }}</button>
+            <button class="copy" (click)="copiar(b.clave, 'clave')">{{ copiado() === 'clave' ? '¡Copiado!' : 'Copiar' }}</button>
+          </div>
+        </div>
+
+        <div class="connstring">
+          <code>{{ cadenaVisible() ? cadena(b) : cadenaOculta(b) }}</code>
+          <button class="icon-btn" (click)="cadenaVisible.set(!cadenaVisible())">{{ cadenaVisible() ? 'Ocultar clave' : 'Mostrar clave' }}</button>
+          <button class="copy" (click)="copiar(cadena(b), 'cadena')">{{ copiado() === 'cadena' ? '¡Copiado!' : 'Copiar' }}</button>
+        </div>
+
+        <dl class="meta">
+          <div><dt>Creada</dt><dd>{{ b.creada }}</dd></div>
+          <div><dt>Última actividad</dt><dd>{{ b.ultimaActividad }}</dd></div>
+        </dl>
+      </div>
+    }
+  </section>
+}
