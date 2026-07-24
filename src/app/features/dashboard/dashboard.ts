@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { DataService } from '../../core/data.service';
@@ -9,10 +9,16 @@ import { DataService } from '../../core/data.service';
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export class Dashboard {
+export class Dashboard implements OnInit {
   private auth = inject(AuthService);
   private router = inject(Router);
-  protected usuario = inject(DataService).usuario;
+  private data = inject(DataService);
+
+  protected usuario = this.data.usuario;
+
+  ngOnInit(): void {
+    this.data.cargarUsuario();   // trae los datos reales de /auth/me
+  }
 
   salir(): void {
     this.auth.logout();
