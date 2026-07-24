@@ -2,45 +2,34 @@ import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
-// Forma que devuelve la API en /auth/me
 interface UsuarioApi {
-  Id: string;
-  Email: string;
-  Name: string;
-  Avatar: string;
-  Provider: string;
-  ProviderId: string;
-  CreatedAt: string;
-  LastLoginAt: string;
+  Id: string; Email: string; Name: string; Avatar: string;
+  Provider: string; ProviderId: string; CreatedAt: string; LastLoginAt: string;
 }
 
-// Modelo interno de una base de datos
 export interface BaseDatos {
-  id: string;
-  host: string;
-  puerto: number;
-  nombre: string;
-  usuario: string;
-  clave: string;
-  motor: string;
-  estado: string;
-  creada: string;
-  usadoMb: number;
-  maxMb: number;
-  ultimaActividad: string;
+  id: string; host: string; puerto: number; nombre: string; usuario: string;
+  clave: string; motor: string; estado: string; creada: string;
+  usadoMb: number; maxMb: number; ultimaActividad: string;
+}
+
+// Devuelve el primer campo que exista de la lista (tolera variaciones de nombre)
+function pick<T>(obj: any, claves: string[], porDefecto: T): T {
+  for (const k of claves) {
+    if (obj?.[k] !== undefined && obj?.[k] !== null) return obj[k];
+  }
+  return porDefecto;
 }
 
 @Injectable({ providedIn: 'root' })
 export class DataService {
   private http = inject(HttpClient);
 
-  // ───── Usuario: DATOS REALES desde /auth/me ─────
+  // ───── Usuario (real, desde /auth/me) ─────
   usuario = signal({
-    nombre: '',
-    email: '',
+    nombre: '', email: '',
     avatar: 'https://ui-avatars.com/api/?name=%20&background=12161F&color=7E8799',
-    proveedor: '',
-    creada: '',
+    proveedor: '', creada: '',
   });
 
   cargarUsuario(): void {
@@ -50,27 +39,64 @@ export class DataService {
         email: u.Email,
         avatar: u.Avatar,
         proveedor: u.Provider === 'google' ? 'Google' : 'GitHub',
-        creada: this.formatearFecha(u.CreatedAt),
+        creada: this.fecha(u.CreatedAt),
       }),
-      error: () => { /* si falla, quedan los valores iniciales */ },
+      error: () => {},
     });
   }
 
-  private formatearFecha(iso: string): string {
-    return new Date(iso).toLocaleDateString('es-CO', {
-      day: 'numeric', month: 'short', year: 'numeric',
+  // ───── Bases de datos (real, desde /databases) ─────
+  bases = signal<BaseDatos[]>([]);
+  basesCargando = signal(true);
+
+  cargarBases(): void {
+    this.basesCargando.set(true);
+    this.http.get<any[]>(`${environment.apiUrl}/databases`).subscribe({
+      next: (lista) => {
+        console.log('Respuesta de /databases:', lista);   // ← para verificar los nombres reales
+        this.bases.set((lista ?? []).map(d => this.mapearBase(d)));
+        this.basesCargando.set(false);
+      },
+      error: (e) => {
+        console.error('Error al cargar /databases:', e);
+        this.bases.set([]);
+        this.basesCargando.set(false);
+      },
     });
   }
 
-  // ───── Bases de datos: TODAVÍA DE EJEMPLO ─────
-  // Pendiente conectar a GET /databases (falta ver la forma real de la respuesta)
-  bases = signal<BaseDatos[]>([
-    { id: 'a1b2', host: 'db.snapshot.andrescortes.dev', puerto: 3306, nombre: 'db_luis_a1b2', usuario: 'luis_a1b2', clave: 'Xk9$mP2vLq8w', motor: 'MySQL 8.0', estado: 'Activa', creada: '17 jul 2026', usadoMb: 3.2, maxMb: 20, ultimaActividad: 'hace 2 minutos' },
-    { id: 'e5f6', host: 'db.snapshot.andrescortes.dev', puerto: 3306, nombre: 'db_luis_e5f6', usuario: 'luis_e5f6', clave: 'Qw3!zXo9pLm2', motor: 'MySQL 8.0', estado: 'Activa', creada: '19 jul 2026', usadoMb: 8.7, maxMb: 20, ultimaActividad: 'hace 1 hora' },
-  ]);
+  private mapearBase(d: any): BaseDatos {
+    const usado = Number(pick(d, ['UsedMb', 'UsedMB', 'used_mb', 'SizeMb'], 0));
+    const max   = Number(pick(d, ['MaxMb', 'MaxMB', 'max_mb', 'QuotaMb'], 20));
+    const estado = String(pick(d, ['Status', 'Estado', 'status'], 'active'));
+    const ultima = pick<string | null>(d, ['LastActivityAt', 'LastActivity', 'last_activity'], null);
 
-  // ───── Logs: TODAVÍA DE EJEMPLO ─────
-  // Pendiente: el endpoint GET /auth/logins aún no existe
+    return {
+      id:      String(pick(d, ['Id', 'ShortId', 'DatabaseId', 'id'], crypto.randomUUID())),
+      host:    String(pick(d, ['Host', 'PublicHost', 'host'], 'db.snapshot.andrescortes.dev')),
+      puerto:  Number(pick(d, ['Port', 'PublicPort', 'port'], 3307)),
+      nombre:  String(pick(d, ['DbName', 'DatabaseName', 'Database', 'Name', 'database'], '—')),
+      usuario: String(pick(d, ['DbUser', 'Username', 'UserName', 'DbUsername', 'username'], '—')),
+      clave:   String(pick(d, ['Password', 'DbPassword', 'password'], '—')),
+      motor:   String(pick(d, ['Engine', 'engine'], 'MySQL 8.0')),
+      estado:  estado.toLowerCase() === 'active' ? 'Activa'
+             : estado.toLowerCase() === 'pending' ? 'Creando…'
+             : estado.toLowerCase() === 'failed' ? 'Con error' : estado,
+      creada:  this.fecha(pick(d, ['CreatedAt', 'created_at'], '')),
+      usadoMb: isNaN(usado) ? 0 : usado,
+      maxMb:   isNaN(max) || max === 0 ? 20 : max,
+      ultimaActividad: ultima ? this.fecha(ultima) : 'Sin actividad',
+    };
+  }
+
+  private fecha(iso: string): string {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return isNaN(d.getTime()) ? '—'
+      : d.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  // ───── Logs: TODAVÍA DE EJEMPLO (falta el endpoint /auth/logins) ─────
   logs = signal([
     { fecha: '21 jul 2026, 14:32', proveedor: 'GitHub', ip: '191.95.33.193', dispositivo: 'Chrome · Windows' },
     { fecha: '20 jul 2026, 09:15', proveedor: 'GitHub', ip: '191.95.33.193', dispositivo: 'Chrome · Windows' },

@@ -17,7 +17,8 @@ export class Dashboard implements OnInit {
   protected usuario = this.data.usuario;
 
   ngOnInit(): void {
-    this.data.cargarUsuario();   // trae los datos reales de /auth/me
+    this.data.cargarUsuario();
+    this.data.cargarBases();
   }
 
   salir(): void {

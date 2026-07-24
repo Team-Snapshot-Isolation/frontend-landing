@@ -1,36 +1,43 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, effect } from '@angular/core';
+import { RouterLink } from '@angular/router';   
 import { DataService, BaseDatos } from '../../../../core/data.service';
 
 @Component({
   selector: 'app-database',
-  imports: [],
+  imports: [RouterLink],                                            // ← antes []
   templateUrl: './database.html',
   styleUrl: './database.scss',
 })
 export class Database {
-  protected bases = inject(DataService).bases;
+  private data = inject(DataService);
+  protected bases = this.data.bases;
+  protected cargando = this.data.basesCargando;
 
-  // Qué tarjeta está expandida (arranca con la primera abierta)
   expandidoId = signal<string | null>(null);
   claveVisible = signal(false);
   cadenaVisible = signal(false);
   copiado = signal<string | null>(null);
 
   constructor() {
-    this.expandidoId.set(this.bases()[0]?.id ?? null);
+    // Cuando lleguen los datos, expande la primera automáticamente
+    effect(() => {
+      const lista = this.bases();
+      if (lista.length > 0 && this.expandidoId() === null) {
+        this.expandidoId.set(lista[0].id);
+      }
+    });
   }
 
   toggle(id: string): void {
     if (this.expandidoId() === id) {
-      this.expandidoId.set(null);
+      this.expandidoId.set('');          // '' = ninguna abierta
     } else {
       this.expandidoId.set(id);
-      this.claveVisible.set(false);   // reinicia al cambiar de tarjeta
+      this.claveVisible.set(false);
       this.cadenaVisible.set(false);
     }
   }
 
-  // La cadena depende de CADA base, así que es un método (no un computed)
   cadena(b: BaseDatos): string {
     return `mysql://${b.usuario}:${b.clave}@${b.host}:${b.puerto}/${b.nombre}`;
   }
