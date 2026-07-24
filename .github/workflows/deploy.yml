@@ -34,6 +34,7 @@ jobs:
       - name: Desplegar a la VPS
         run: |
           rsync -avz --delete \
+            --exclude 'status/' \
             -e "ssh -i ~/.ssh/deploy_key" \
             dist/frontend-landing/browser/ \
             ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/snapshot/
