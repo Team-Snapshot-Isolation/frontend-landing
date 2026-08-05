@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { DataService } from '../../core/data.service';
+import { ThemeService } from '../../core/theme.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,6 +16,8 @@ export class Dashboard implements OnInit {
   private data = inject(DataService);
 
   protected usuario = this.data.usuario;
+  protected servicios = this.data.servicios;
+  protected theme = inject(ThemeService);
 
   ngOnInit(): void {
     this.data.cargarUsuario();

@@ -1,0 +1,87 @@
+<!-- Encabezado con saludo -->
+<div class="ov-head">
+  <span class="eyebrow">Vista general</span>
+  <h1>{{ saludo() }}{{ primerNombre() ? ', ' + primerNombre() : '' }} 👋</h1>
+  <p class="ov-sub">Este es el estado de tus servicios en Snapshot.</p>
+</div>
+
+<!-- Métricas rápidas -->
+<div class="ov-stats">
+  <div class="ov-stat">
+    <span class="ov-stat__val">{{ activos() }}</span>
+    <span class="ov-stat__lbl">Servicios activos</span>
+  </div>
+  <div class="ov-stat">
+    <span class="ov-stat__val">{{ bases().length }}</span>
+    <span class="ov-stat__lbl">Bases de datos</span>
+  </div>
+  <div class="ov-stat">
+    <span class="ov-stat__val">{{ servicios().length }}</span>
+    <span class="ov-stat__lbl">Servicios disponibles</span>
+  </div>
+  <div class="ov-stat">
+    <span class="ov-stat__val">{{ usuario().proveedor || '—' }}</span>
+    <span class="ov-stat__lbl">Método de acceso</span>
+  </div>
+</div>
+
+<!-- Tarjetas de resumen por servicio -->
+<h2 class="ov-title">Tus servicios</h2>
+
+<div class="ov-grid">
+  @for (s of servicios(); track s.id) {
+    <a class="ov-card" [class.ov-card--soon]="s.estado !== 'activo'" [routerLink]="s.ruta">
+      <div class="ov-card__top">
+        <span class="ov-card__icon">
+          @switch (s.icono) {
+            @case ('workflow') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="15" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><path d="M6 9v6a2 2 0 0 0 2 2h5M18 9v3"/></svg> }
+            @case ('database') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg> }
+            @case ('sparkles') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg> }
+            @case ('globe') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.5 6 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-6-3.5-9s1-6.5 3.5-9z"/></svg> }
+          }
+        </span>
+
+        @if (s.estado === 'activo') {
+          <span class="ov-badge ov-badge--on"><span class="dot"></span> Activo</span>
+        } @else {
+          <span class="ov-badge ov-badge--soon">En construcción</span>
+        }
+      </div>
+
+      <h3 class="ov-card__name">{{ s.nombre }}</h3>
+      <p class="ov-card__info">{{ resumenDe(s.id) }}</p>
+
+      <span class="ov-card__go">
+        {{ s.estado === 'activo' ? 'Gestionar' : 'Ver detalles' }}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+      </span>
+    </a>
+  }
+</div>
+
+<!-- Accesos rápidos -->
+<h2 class="ov-title">Accesos rápidos</h2>
+
+<div class="ov-quick">
+  <a class="ov-qcard" routerLink="/dashboard/database">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 5v14M5 12h14"/></svg>
+    <div>
+      <strong>Crear base de datos</strong>
+      <span>Aprovisiona una base MySQL nueva</span>
+    </div>
+  </a>
+  <a class="ov-qcard" routerLink="/dashboard/account">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    <div>
+      <strong>Mi cuenta</strong>
+      <span>Revisa los datos de tu perfil</span>
+    </div>
+  </a>
+  <a class="ov-qcard" routerLink="/dashboard/logs">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+    <div>
+      <strong>Inicios de sesión</strong>
+      <span>Consulta tu actividad reciente</span>
+    </div>
+  </a>
+</div>

@@ -1,0 +1,30 @@
+<div class="nf">
+  <div class="nf__glow" aria-hidden="true"></div>
+
+  <div class="nf__content reveal">
+    <span class="nf__code">404</span>
+    <h1 class="nf__title">Esta página se perdió en la nube</h1>
+    <p class="nf__text">
+      La dirección que buscas no existe o fue movida. Pero tranquilo,
+      todos tus servicios siguen en su lugar.
+    </p>
+
+    <div class="nf__actions">
+      <a class="btn btn--primary" routerLink="/">Volver al inicio</a>
+      <a class="btn btn--ghost" routerLink="/dashboard">Ir a mi panel</a>
+    </div>
+  </div>
+
+  <!-- Decoración: terminal con un "error" temático -->
+  <div class="nf__card reveal" style="animation-delay: .15s" aria-hidden="true">
+    <div class="nf__card-bar">
+      <span>snapshot://query</span>
+      <span class="nf__card-status">404</span>
+    </div>
+    <div class="nf__card-body">
+      <p><span class="nf__prompt">$</span> GET /pagina-solicitada</p>
+      <p class="nf__err">✗ Recurso no encontrado</p>
+      <p><span class="nf__prompt">$</span> redirect --to=inicio<span class="caret"></span></p>
+    </div>
+  </div>
+</div>

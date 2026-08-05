@@ -1,0 +1,109 @@
+<div class="section-head">
+  <span class="eyebrow">Automatización</span>
+  <h1>Tu espacio de n8n</h1>
+</div>
+
+@if (cargando()) {
+
+  <p class="loading">Cargando tu espacio…</p>
+
+} @else if (cuenta().estado === 'activo') {
+
+  <!-- Cabecera de la cuenta -->
+  <section class="card n8n-hero">
+    <div class="n8n-hero__left">
+      <span class="estado"><span class="dot"></span> Cuenta activa</span>
+      <h2 class="n8n-hero__ws">{{ cuenta().email }}</h2>
+      <span class="n8n-hero__date">
+        Creada el {{ cuenta().creada }}
+        @if (cuenta().rol) { · Rol: {{ cuenta().rol }} }
+      </span>
+    </div>
+  </section>
+
+  <!-- Acceso a la cuenta -->
+  <section class="card">
+    <div class="card__head">
+      <h2>Acceso a tu cuenta</h2>
+      <span class="engine">n8n</span>
+    </div>
+
+    @if (!credencialVisible()) {
+      <p class="cred-info">
+        Tu enlace de acceso es privado. Pulsa el botón para verlo — la consulta queda registrada por seguridad.
+      </p>
+      <button class="btn btn--ghost" (click)="verCredencial()">Ver mi enlace de acceso</button>
+    } @else if (cuenta().credencial) {
+      <p class="cred-info">
+        Abre este enlace para configurar tu contraseña y entrar a tu espacio de n8n.
+      </p>
+      <div class="cred-box">
+        <code>{{ cuenta().credencial }}</code>
+        <button class="copy" (click)="copiar(cuenta().credencial)">
+          {{ copiado() ? '¡Copiado!' : 'Copiar' }}
+        </button>
+      </div>
+      <a class="btn btn--primary cred-open" [href]="cuenta().credencial" target="_blank" rel="noopener noreferrer">
+        Abrir enlace
+      </a>
+    } @else {
+      <p class="cred-info">Obteniendo tu enlace…</p>
+    }
+  </section>
+
+  <!-- Límites del plan -->
+  <section class="grid-3">
+    <div class="card lim">
+      <span class="lim__val">{{ cuenta().workflowsMax }}</span>
+      <span class="lim__lbl">Workflows permitidos</span>
+    </div>
+    <div class="card lim">
+      <span class="lim__val">{{ cuenta().ejecucionesMax }}</span>
+      <span class="lim__lbl">Ejecuciones al mes</span>
+    </div>
+    <div class="card lim">
+      <span class="lim__val">{{ cuenta().almacenamientoMax }} MB</span>
+      <span class="lim__lbl">Almacenamiento</span>
+    </div>
+  </section>
+
+  <!-- Primeros pasos -->
+  <section class="card tips">
+    <h2 class="card__title">Primeros pasos</h2>
+    <ul class="tips__list">
+      <li>Abre tu enlace de acceso y define tu contraseña.</li>
+      <li>Crea tu primer workflow desde la plantilla que prefieras.</li>
+      <li>Conecta tus servicios de Snapshot como fuente de datos.</li>
+    </ul>
+  </section>
+
+} @else {
+
+  <!-- Sin cuenta activa (ninguna, pendiente o fallida) -->
+  <section class="card empty-n8n">
+    <div class="empty-n8n__icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="15" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><path d="M6 9v6a2 2 0 0 0 2 2h5M18 9v3"/></svg>
+    </div>
+
+    @if (cuenta().estado === 'fallido') {
+      <h2>No pudimos crear tu espacio</h2>
+      <p>Hubo un problema al aprovisionar tu cuenta de n8n. Puedes reintentarlo aquí.</p>
+    } @else if (cuenta().estado === 'pendiente') {
+      <h2>Tu espacio se está creando</h2>
+      <p>Estamos preparando tu cuenta de n8n. Esto puede tardar unos momentos.</p>
+    } @else {
+      <h2>Aún no tienes un espacio de n8n</h2>
+      <p>Crea tu cuenta y empieza a automatizar flujos de trabajo sin escribir código.</p>
+    }
+
+    @if (error()) { <p class="error-msg">{{ error() }}</p> }
+
+    <button class="btn btn--primary" (click)="aprovisionar()" [disabled]="aprovisionando()">
+      @if (aprovisionando()) {
+        <span class="spinner"></span> Creando tu espacio…
+      } @else {
+        {{ cuenta().estado === 'fallido' ? 'Reintentar creación' : 'Crear mi espacio de n8n' }}
+      }
+    </button>
+  </section>
+}

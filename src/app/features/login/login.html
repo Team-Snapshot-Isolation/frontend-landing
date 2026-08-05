@@ -4,20 +4,34 @@
 
     <div class="tabs">
       <button class="tab" [class.tab--active]="modo() === 'login'" (click)="setModo('login')">Iniciar sesión</button>
-      <button class="tab" [class.tab--active]="modo() === 'registro'" (click)="setModo('registro')">Crear cuenta</button>
+      <button class="tab" [class.tab--active]="modo() === 'registro'" (click)="setModo('registro')">Crear
+        cuenta</button>
     </div>
 
     @if (modo() === 'login') {
-      <h1>Bienvenido de nuevo</h1>
-      <p class="login__sub">Entra con tu cuenta y accede a tu base de datos.</p>
+    <h1>Bienvenido de nuevo</h1>
+    <p class="login__sub">Entra con tu cuenta y accede a tus servicios.</p>
     } @else {
-      <h1>Crea tu cuenta gratis</h1>
-      <p class="login__sub">Regístrate y te aprovisionamos una base MySQL al instante.</p>
+    <h1>Crea tu cuenta gratis</h1>
+    <p class="login__sub">Regístrate y empieza a usar la plataforma al instante.</p>
     }
 
     <div class="login__providers">
-      <button class="btn btn--github" (click)="continuarCon('github')">Continuar con GitHub</button>
-      <button class="btn btn--google" (click)="continuarCon('google')">Continuar con Google</button>
+      <button class="btn btn--github" (click)="continuarCon('github')" [disabled]="conectando() !== null">
+        @if (conectando() === 'github') {
+        <span class="spinner"></span> Conectando con GitHub…
+        } @else {
+        Continuar con GitHub
+        }
+      </button>
+
+      <button class="btn btn--google" (click)="continuarCon('google')" [disabled]="conectando() !== null">
+        @if (conectando() === 'google') {
+        <span class="spinner"></span> Conectando con Google…
+        } @else {
+        Continuar con Google
+        }
+      </button>
     </div>
 
     <p class="login__legal">Al continuar te conectas de forma segura con OAuth2. No guardamos tu contraseña.</p>

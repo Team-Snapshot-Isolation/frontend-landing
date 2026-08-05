@@ -1,0 +1,39 @@
+.scroll-top {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 60;
+
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+
+  background: var(--gradient-accent);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 24px var(--accent-glow);
+
+  /* Oculto por defecto: transparente, desplazado y sin recibir clics */
+  opacity: 0;
+  transform: translateY(15px);
+  pointer-events: none;
+  transition: opacity .3s ease, transform .3s ease;
+}
+
+/* Visible: aparece suavemente */
+.scroll-top--visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.scroll-top:hover {
+  transform: translateY(-3px);
+}
+.scroll-top svg {
+  width: 22px;
+  height: 22px;
+}

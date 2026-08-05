@@ -1,9 +1,11 @@
-import { Component, signal, inject, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Component, signal, inject, OnInit, OnDestroy } from '@angular/core';import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
+import { DataService } from '../../core/data.service';
+import { ThemeService } from '../../core/theme.service';
+import { ScrollTop } from '../../shared/scroll-top/scroll-top';
+import { Reveal } from '../../shared/reveal';
 
-// Forma que devuelve la API en /metrics/platform
 interface MetricasApi {
   TotalUsers: number;
   TotalDatabases: number;
@@ -14,49 +16,111 @@ interface MetricasApi {
 
 @Component({
   selector: 'app-landing',
-  imports: [RouterLink],
+  imports: [RouterLink, ScrollTop, Reveal],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
 })
-export class Landing implements OnInit {
+export class Landing implements OnInit, OnDestroy {
   private http = inject(HttpClient);
 
-  // Arranca con guiones; se llena cuando responde la API
+  // Catálogo de servicios (viene del store) — lo usa el @for del HTML
+  protected servicios = inject(DataService).servicios;
+
+  // Métricas de la plataforma (arrancan con guiones, se llenan desde /metrics/platform)
   metricas = signal([
     { valor: '—', etiqueta: 'Usuarios registrados' },
-    { valor: '—', etiqueta: 'Bases de datos creadas' },
-    { valor: '—', etiqueta: 'Bases activas' },
+    { valor: '—', etiqueta: 'Servicios activos' },
     { valor: '—', etiqueta: 'Inicios de sesión' },
     { valor: '—', etiqueta: 'Usuarios activos' },
-    { valor: '99.9%', etiqueta: 'Disponibilidad' },
   ]);
+
+  // Estado de las métricas: cargando | listo | error
+  estadoMetricas = signal<'cargando' | 'listo' | 'error'>('cargando');
 
   ngOnInit(): void {
     this.http.get<MetricasApi>(`${environment.apiUrl}/metrics/platform`).subscribe({
-      next: (m) => this.metricas.set([
-        { valor: m.TotalUsers.toLocaleString('es-CO'),      etiqueta: 'Usuarios registrados' },
-        { valor: m.TotalDatabases.toLocaleString('es-CO'),  etiqueta: 'Bases de datos creadas' },
-        { valor: m.ActiveDatabases.toLocaleString('es-CO'), etiqueta: 'Bases activas' },
-        { valor: m.TotalLogins.toLocaleString('es-CO'),     etiqueta: 'Inicios de sesión' },
-        { valor: m.ActiveUsers.toLocaleString('es-CO'),     etiqueta: 'Usuarios activos' },
-        { valor: '99.9%', etiqueta: 'Disponibilidad' },
-      ]),
-      error: () => { /* si falla, se quedan los guiones */ },
+      next: (m) => {
+        this.metricas.set([
+          { valor: m.TotalUsers.toLocaleString('es-CO'),  etiqueta: 'Usuarios registrados' },
+          { valor: '1',                                   etiqueta: 'Servicios activos' },
+          { valor: m.TotalLogins.toLocaleString('es-CO'), etiqueta: 'Inicios de sesión' },
+          { valor: m.ActiveUsers.toLocaleString('es-CO'), etiqueta: 'Usuarios activos' },
+        ]);
+        this.estadoMetricas.set('listo');
+      },
+      error: () => this.estadoMetricas.set('error'),
     });
+
+    this.iniciarCarrusel();
   }
 
-  features = signal([
-    { titulo: 'MySQL en segundos',         texto: 'Tu base queda lista y conectable apenas inicias sesión.' },
-    { titulo: 'Entra con Google o GitHub', texto: 'Sin formularios ni contraseñas nuevas que recordar.' },
-    { titulo: 'Credenciales seguras',      texto: 'Generamos una contraseña fuerte y única para tu base.' },
-    { titulo: 'Permisos aislados',         texto: 'Cada usuario solo accede a su propia base de datos.' },
-    { titulo: 'Panel con uso en vivo',     texto: 'Consulta espacio, estado y última actividad cuando quieras.' },
-    { titulo: '20 MB gratis por base',     texto: 'Suficiente para tus proyectos, prácticas y pruebas.' },
+  // Los 3 pasos — ahora en clave multi-servicio
+  pasos = signal([
+    { n: '1', titulo: 'Inicia sesión',        texto: 'Entra con tu cuenta de Google o GitHub en un solo clic.' },
+    { n: '2', titulo: 'Elige un servicio',    texto: 'Accede a automatización n8n y, muy pronto, bases de datos, IA y DNS.' },
+    { n: '3', titulo: 'Empieza a construir',  texto: 'Recibe tus credenciales de acceso y úsalas al instante en tus proyectos.' },
   ]);
 
-  pasos = signal([
-    { n: '1', titulo: 'Inicia sesión',          texto: 'Entra con tu cuenta de Google o GitHub en un clic.' },
-    { n: '2', titulo: 'Se aprovisiona tu base', texto: 'Creamos tu base MySQL y su usuario automáticamente.' },
-    { n: '3', titulo: 'Conéctate',              texto: 'Copia tus credenciales y úsalas desde tu proyecto.' },
+  // ─── Carrusel del hero ───
+  // Cada servicio con los datos que se muestran en la tarjeta estrella
+  slides = signal([
+    {
+      id: 'n8n', etiqueta: 'n8n', titulo: 'Automatización n8n',
+      campos: [
+        { k: 'servicio', v: 'Automatización n8n' },
+        { k: 'workspace', v: 'luis-a1b2' },
+        { k: 'acceso', v: 'n8n.snapshot.andrescortes.dev' },
+        { k: 'usuario', v: 'luis_a1b2' },
+      ],
+    },
+    {
+      id: 'db', etiqueta: 'MySQL 8.0', titulo: 'Bases de datos',
+      campos: [
+        { k: 'motor', v: 'MySQL 8.0' },
+        { k: 'host', v: 'db.snapshot.andrescortes.dev' },
+        { k: 'puerto', v: '3307' },
+        { k: 'usuario', v: 'luis_a1b2' },
+      ],
+    },
+    {
+      id: 'ai', etiqueta: 'AI API', titulo: 'IA como servicio',
+      campos: [
+        { k: 'servicio', v: 'IA como servicio' },
+        { k: 'endpoint', v: 'ai.snapshot.andrescortes.dev' },
+        { k: 'api-key', v: 'sk_live_a1b2c3d4' },
+        { k: 'modelo', v: 'gpt-oss-120b' },
+      ],
+    },
+    {
+      id: 'dns', etiqueta: 'DNS', titulo: 'Subdominios DNS',
+      campos: [
+        { k: 'servicio', v: 'Subdominios DNS' },
+        { k: 'subdominio', v: 'miapp.celula.coderhivex.com' },
+        { k: 'tipo', v: 'CNAME' },
+        { k: 'ssl', v: 'Activo · Let\'s Encrypt' },
+      ],
+    },
   ]);
+
+  slideActual = signal(0);
+  private carruselTimer?: ReturnType<typeof setInterval>;
+
+  private iniciarCarrusel(): void {
+    this.carruselTimer = setInterval(() => this.siguienteSlide(), 3500);
+  }
+  siguienteSlide(): void {
+    this.slideActual.update(i => (i + 1) % this.slides().length);
+  }
+  pausarCarrusel(): void {
+    if (this.carruselTimer) clearInterval(this.carruselTimer);
+  }
+  reanudarCarrusel(): void {
+    this.pausarCarrusel();
+    this.iniciarCarrusel();
+  }
+  ngOnDestroy(): void {
+    this.pausarCarrusel();
+  }
+  
+  protected theme = inject(ThemeService);
 }

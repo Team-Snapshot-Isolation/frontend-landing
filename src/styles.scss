@@ -1,17 +1,64 @@
 /* ===== Variables del tema (se usan en toda la app) ===== */
-:root {
-  --bg:        #0A0C10;
-  --surface:   #12161F;
-  --border:    #242B39;
-  --text:      #E7EAF0;
-  --muted:     #7E8799;
-  --accent:    #5B8CFF;   /* azul: infraestructura */
-  --accent-2:  #9B7BFF;   /* violeta: profundidad */
-  --online:    #35D07F;   /* verde: SOLO estado activo */
+/* ===== TEMA OSCURO (por defecto) ===== */
+:root,
+[data-theme="dark"] {
+  --bg: #08090D;
+  --bg-elevated: #0D0F15;
+  --surface: #12141C;
+  --surface-hover: #171922;
+  --border: #21242E;
+  --border-strong: #2E3240;
 
-  --font-display: 'Space Grotesk', system-ui, sans-serif;
-  --font-body:    system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-mono:    'JetBrains Mono', ui-monospace, Menlo, monospace;
+  --text: #F2F4F8;
+  --muted: #8A92A6;
+  --muted-soft: #5A6072;
+
+  --accent: #6E9BFF;
+  --accent-2: #A788FF;
+  --accent-glow: rgba(110, 155, 255, 0.4);
+
+  --online: #3DDC84;
+  --online-bg: rgba(61, 220, 132, 0.12);
+  --building: #FFB454;
+  --building-bg: rgba(255, 180, 84, 0.12);
+  --offline: #6A7080;
+  --offline-bg: rgba(106, 112, 128, 0.1);
+
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --gradient-accent: linear-gradient(135deg, var(--accent), var(--accent-2));
+}
+
+/* ===== TEMA CLARO ===== */
+[data-theme="light"] {
+  --bg: #F7F8FB;
+  --bg-elevated: #FFFFFF;
+  --surface: #FFFFFF;
+  --surface-hover: #F0F2F7;
+  --border: #E2E5EC;
+  --border-strong: #CFD4DE;
+
+  --text: #14161C;
+  --muted: #5C6475;
+  --muted-soft: #8A92A0;
+
+  --accent: #4571E8;
+  --accent-2: #8B5CF6;
+  --accent-glow: rgba(69, 113, 232, 0.25);
+
+  --online: #17A45C;
+  --online-bg: rgba(23, 164, 92, 0.1);
+  --building: #D97917;
+  --building-bg: rgba(217, 121, 23, 0.1);
+  --offline: #9AA0AC;
+  --offline-bg: rgba(154, 160, 172, 0.12);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  transition: background .3s ease, color .3s ease;
 }
 
 /* ===== Reset ===== */

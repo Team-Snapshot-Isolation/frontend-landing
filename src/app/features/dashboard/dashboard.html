@@ -3,28 +3,66 @@
     <a class="brand" routerLink="/"><span class="brand__mark">◈</span> Snapshot</a>
 
     <nav class="menu">
-      <a class="menu__item" routerLink="/dashboard/database" routerLinkActive="active">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>
-        Base de datos
+      <!-- Vista general -->
+      <a class="menu__item" routerLink="/dashboard/overview" routerLinkActive="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Vista general
       </a>
+
+      <!-- Grupo: Servicios -->
+      <span class="menu__group">Servicios</span>
+      @for (s of servicios(); track s.id) {
+        <a class="menu__item" [routerLink]="s.ruta" routerLinkActive="active">
+          <span class="menu__icon">
+            @switch (s.icono) {
+              @case ('workflow') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="15" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><path d="M6 9v6a2 2 0 0 0 2 2h5M18 9v3"/></svg> }
+              @case ('database') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg> }
+              @case ('sparkles') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg> }
+              @case ('globe') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.5 6 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-6-3.5-9s1-6.5 3.5-9z"/></svg> }
+            }
+          </span>
+          <span class="menu__label">{{ s.nombre }}</span>
+
+          <!-- Indicadores de estado -->
+          @if (s.estado === 'activo') {
+            <span class="menu__dot menu__dot--on"></span>
+          } @else if (s.estado === 'construccion') {
+            <span class="menu__soon">pronto</span>
+            <span class="menu__dot menu__dot--building"></span>
+          }
+        </a>
+      }
+
+      <!-- Grupo: Cuenta -->
+      <span class="menu__group">Cuenta</span>
       <a class="menu__item" routerLink="/dashboard/account" routerLinkActive="active">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-        Mi cuenta
+        <span class="menu__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
+        <span class="menu__label">Mi cuenta</span>
       </a>
       <a class="menu__item" routerLink="/dashboard/logs" routerLinkActive="active">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-        Inicios de sesión
+        <span class="menu__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+        <span class="menu__label">Inicios de sesión</span>
       </a>
     </nav>
 
-    <a class="new-btn" routerLink="/dashboard/new" routerLinkActive="active">+ Nueva base de datos</a>
-
     <div class="sidebar__foot">
-      <img class="avatar" [src]="usuario().avatar" [alt]="usuario().nombre">
+      <button class="theme-toggle" (click)="theme.alternar()"
+              [attr.aria-label]="theme.tema() === 'dark' ? 'Modo claro' : 'Modo oscuro'">
+        @if (theme.tema() === 'dark') {
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        } @else {
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        }
+      </button>
+
       <div class="sidebar__user">
-        <span class="sidebar__name">{{ usuario().nombre }}</span>
-        <span class="sidebar__mail">{{ usuario().email }}</span>
+        <img class="avatar" [src]="usuario().avatar" [alt]="usuario().nombre">
+        <div class="sidebar__info">
+          <span class="sidebar__name">{{ usuario().nombre || 'Usuario' }}</span>
+          <span class="sidebar__mail">{{ usuario().email }}</span>
+        </div>
       </div>
+
       <button class="logout" (click)="salir()" title="Cerrar sesión">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
       </button>

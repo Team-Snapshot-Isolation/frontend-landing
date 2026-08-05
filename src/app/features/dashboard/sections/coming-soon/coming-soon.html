@@ -1,0 +1,49 @@
+@if (servicio(); as s) {
+
+  <div class="section-head">
+    <span class="eyebrow">Próximamente</span>
+    <h1>{{ s.nombre }}</h1>
+  </div>
+
+  <section class="card cs">
+    <div class="cs__icon">
+      @switch (s.icono) {
+        @case ('sparkles') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg> }
+        @case ('globe') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.5 6 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-6-3.5-9s1-6.5 3.5-9z"/></svg> }
+        @case ('workflow') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="15" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><path d="M6 9v6a2 2 0 0 0 2 2h5M18 9v3"/></svg> }
+        @case ('database') { <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg> }
+      }
+    </div>
+
+    <span class="cs__badge">En construcción</span>
+    <h2 class="cs__title">Este servicio estará disponible pronto</h2>
+    <p class="cs__desc">{{ s.descripcion }}</p>
+
+    <div class="cs__bar">
+      <div class="cs__bar-fill"></div>
+    </div>
+    <span class="cs__status">Trabajando en la integración…</span>
+  </section>
+
+  <section class="card">
+    <h2 class="card__title">Qué podrás hacer</h2>
+    <ul class="cs__list">
+      @for (c of s.caracteristicas ?? []; track c) {
+        <li>{{ c }}</li>
+      }
+    </ul>
+    @if (s.proveedor) {
+      <p class="cs__note">{{ s.proveedor }}</p>
+    }
+  </section>
+
+  <div class="cs__actions">
+    <a class="btn btn--ghost" routerLink="/dashboard/overview">← Volver a la vista general</a>
+  </div>
+
+} @else {
+  <div class="section-head">
+    <h1>Servicio no encontrado</h1>
+  </div>
+  <a class="btn btn--ghost" routerLink="/dashboard/overview">← Volver a la vista general</a>
+}

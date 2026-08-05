@@ -1,0 +1,52 @@
+.cs { text-align: center; padding: 3rem 1.6rem; }
+
+.cs__icon {
+  width: 76px; height: 76px; margin: 0 auto 1.4rem;
+  display: grid; place-items: center; border-radius: 22px;
+  background: var(--bg); border: 1px solid var(--border);
+  color: var(--building);
+}
+.cs__icon svg { width: 36px; height: 36px; }
+
+.cs__badge {
+  display: inline-block; font-size: .72rem; font-weight: 600;
+  color: var(--building); background: var(--building-bg);
+  padding: .35rem .8rem; border-radius: 999px; margin-bottom: 1rem;
+}
+.cs__title { font-family: var(--font-display); font-size: 1.3rem; margin-bottom: .6rem; }
+.cs__desc { color: var(--muted); font-size: .98rem; line-height: 1.6; max-width: 460px; margin: 0 auto 2rem; }
+
+/* Barra de progreso indeterminada */
+.cs__bar {
+  width: 200px; height: 4px; margin: 0 auto .8rem;
+  background: var(--bg); border-radius: 999px; overflow: hidden;
+}
+.cs__bar-fill {
+  width: 40%; height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--building), #FFD08A);
+  animation: cs-slide 1.8s ease-in-out infinite;
+}
+@keyframes cs-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(250%); }
+}
+.cs__status { font-size: .82rem; color: var(--muted-soft); }
+
+/* Lista de características */
+.cs__list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: .8rem; }
+.cs__list li {
+  position: relative; padding-left: 1.8rem;
+  color: var(--text); font-size: .93rem; line-height: 1.5;
+}
+.cs__list li::before {
+  content: '';
+  position: absolute; left: 0; top: .45rem;
+  width: 8px; height: 8px; border-radius: 3px;
+  background: var(--gradient-accent);
+}
+.cs__note {
+  margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: .78rem; color: var(--muted);
+}
+
+.cs__actions { margin-top: 1.5rem; }

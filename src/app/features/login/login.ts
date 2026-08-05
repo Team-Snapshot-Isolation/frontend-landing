@@ -2,6 +2,7 @@ import { Component, signal, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 
+
 @Component({
   selector: 'app-login',
   imports: [RouterLink],
@@ -24,8 +25,11 @@ export class Login {
     this.modo.set(m);
   }
 
-  // Ahora sí manda al OAuth real de la API
+  // Guarda qué proveedor se está conectando (null = ninguno)
+  conectando = signal<'github' | 'google' | null>(null);
+
   continuarCon(proveedor: 'github' | 'google'): void {
-    this.auth.loginCon(proveedor);
+    this.conectando.set(proveedor);   // marca que empezó a conectar
+    this.auth.loginCon(proveedor);    // redirige a la API (esto ya lo tenías)
   }
 }
