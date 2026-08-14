@@ -24,7 +24,7 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'overview', pathMatch: 'full' },
       { path: 'overview', component: Overview }, 
-      { path: 'database', component: ComingSoon },
+      { path: 'database', component: Database },
       { path: 'account', component: Account },
       { path: 'logs', component: Logs },
       { path: 'new', component: NewDatabase },

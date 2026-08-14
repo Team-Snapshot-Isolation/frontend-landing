@@ -19,9 +19,18 @@ interface UsuarioApi {
 }
 
 export interface BaseDatos {
-  id: string; host: string; puerto: number; nombre: string; usuario: string;
-  clave: string; motor: string; estado: string; creada: string;
-  usadoMb: number; maxMb: number; ultimaActividad: string;
+  id: string;
+  nombre: string;
+  usuario: string;
+  clave: string;
+  host: string;
+  puerto: number | null;
+  motor: string;
+  estado: 'activa' | 'creando' | 'fallida' | string;
+  creada: string;
+  ultimaActividad: string;
+  usadoMb: number;
+  maxMb: number;
 }
 
 export interface CuentaN8n {
@@ -59,7 +68,7 @@ export class DataService {
     {
       id: 'database', nombre: 'Bases de datos',
       descripcion: 'Aprovisiona bases de datos gestionadas para tus proyectos.',
-      icono: 'database', estado: 'construccion', esNuestro: false, ruta: '/dashboard/database',
+      icono: 'database', estado: 'activo', esNuestro: false, ruta: '/dashboard/database',
       proveedor: 'Integración entre equipos',
       caracteristicas: [
         'Solicita una base de datos para tu proyecto',
@@ -93,8 +102,8 @@ export class DataService {
     },
   ]);
 
-// ───── n8n (real) ─────
-n8n = signal<CuentaN8n>({
+  // ───── n8n (real) ─────
+  n8n = signal<CuentaN8n>({
     estado: 'ninguno', email: '', rol: '', creada: '', ultimaActividad: '',
     workflowsMax: 0, ejecucionesMax: 0, almacenamientoMax: 0,
     credencial: '', tipoAcceso: '',
@@ -109,8 +118,8 @@ n8n = signal<CuentaN8n>({
         this.n8n.update(c => ({
           ...c,
           estado: estado === 'active' ? 'activo'
-                : estado === 'pending' ? 'pendiente'
-                : estado === 'failed' ? 'fallido' : 'ninguno',
+            : estado === 'pending' ? 'pendiente'
+              : estado === 'failed' ? 'fallido' : 'ninguno',
           email: r?.Email ?? '',
           rol: r?.Role ?? '',
           creada: this.fecha(r?.CreatedAt ?? ''),
@@ -135,7 +144,7 @@ n8n = signal<CuentaN8n>({
         credencial: r?.credential ?? '',
         tipoAcceso: r?.access_type ?? '',
       })),
-      error: () => {},
+      error: () => { },
     });
   }
 
@@ -167,39 +176,48 @@ n8n = signal<CuentaN8n>({
     this.basesCargando.set(true);
     this.http.get<any[]>(`${environment.apiUrl}/databases`).subscribe({
       next: (lista) => {
-        console.log('Respuesta de /databases:', lista);   // ← para verificar los nombres reales
         this.bases.set((lista ?? []).map(d => this.mapearBase(d)));
         this.basesCargando.set(false);
       },
-      error: (e) => {
-        console.error('Error al cargar /databases:', e);
+      error: () => {
         this.bases.set([]);
         this.basesCargando.set(false);
       },
     });
   }
 
-  private mapearBase(d: any): BaseDatos {
-    const usado = Number(pick(d, ['UsedMb', 'UsedMB', 'used_mb', 'SizeMb'], 0));
-    const max = Number(pick(d, ['MaxMb', 'MaxMB', 'max_mb', 'QuotaMb'], 20));
-    const estado = String(pick(d, ['Status', 'Estado', 'status'], 'active'));
-    const ultima = pick<string | null>(d, ['LastActivityAt', 'LastActivity', 'last_activity'], null);
+  // Las credenciales se piden aparte, solo cuando el usuario las solicita
+  cargarCredencialesBase(id: string): void {
+    this.http.get<any>(`${environment.apiUrl}/databases/${id}/credentials`).subscribe({
+      next: (r) => this.bases.update(lista => lista.map(b => b.id !== id ? b : {
+        ...b,
+        nombre: String(r?.db_name ?? b.nombre),
+        usuario: String(r?.db_user ?? b.usuario),
+        clave: String(r?.password ?? ''),
+        host: String(r?.host ?? b.host),
+        puerto: Number(r?.port ?? b.puerto) || b.puerto,
+      })),
+      error: () => { },
+    });
+  }
 
+  private mapearBase(d: any): BaseDatos {
+    const estado = String(d?.Status ?? '').toLowerCase();
     return {
-      id: String(pick(d, ['Id', 'ShortId', 'DatabaseId', 'id'], crypto.randomUUID())),
-      host: String(pick(d, ['Host', 'PublicHost', 'host'], 'db.snapshot.andrescortes.dev')),
-      puerto: Number(pick(d, ['Port', 'PublicPort', 'port'], 3307)),
-      nombre: String(pick(d, ['DbName', 'DatabaseName', 'Database', 'Name', 'database'], '—')),
-      usuario: String(pick(d, ['DbUser', 'Username', 'UserName', 'DbUsername', 'username'], '—')),
-      clave: String(pick(d, ['Password', 'DbPassword', 'password'], '—')),
-      motor: String(pick(d, ['Engine', 'engine'], 'MySQL 8.0')),
-      estado: estado.toLowerCase() === 'active' ? 'Activa'
-        : estado.toLowerCase() === 'pending' ? 'Creando…'
-          : estado.toLowerCase() === 'failed' ? 'Con error' : estado,
-      creada: this.fecha(pick(d, ['CreatedAt', 'created_at'], '')),
-      usadoMb: isNaN(usado) ? 0 : usado,
-      maxMb: isNaN(max) || max === 0 ? 20 : max,
-      ultimaActividad: ultima ? this.fecha(ultima) : 'Sin actividad',
+      id: String(d?.Id ?? crypto.randomUUID()),
+      nombre: String(d?.DbName ?? '') || '—',
+      usuario: d?.DbUser ?? '',
+      clave: '',                          // llega solo al pedir credenciales
+      host: d?.Host ?? '',
+      puerto: d?.Port ?? null,
+      motor: String(d?.Engine ?? 'mysql').toLowerCase() === 'mysql' ? 'MySQL' : String(d?.Engine ?? ''),
+      estado: estado === 'active' ? 'activa'
+        : estado === 'pending' ? 'creando'
+          : estado === 'failed' ? 'fallida' : estado,
+      creada: this.fecha(d?.CreatedAt ?? ''),
+      ultimaActividad: d?.LastActivityAt ? this.fecha(d.LastActivityAt) : 'Sin actividad',
+      usadoMb: Number(d?.SizeMB ?? 0),
+      maxMb: Number(d?.MaxSizeMB ?? 20) || 20,
     };
   }
 
