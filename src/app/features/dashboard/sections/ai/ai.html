@@ -1,0 +1,114 @@
+<div class="section-head">
+  <span class="eyebrow">IA como servicio</span>
+  <h1>Tus API-Keys de IA</h1>
+</div>
+
+@if (claveCreada(); as nueva) {
+<section class="card ai-new">
+  <span class="ai-new__badge">Se muestra una sola vez</span>
+  <h2>Tu API-Key está lista</h2>
+  <p class="cred-info">Guárdala ahora en tu gestor de secretos — no vamos a poder mostrártela de nuevo.</p>
+  <div class="cred-box">
+    <code>{{ nueva.apiKey }}</code>
+    <button class="copy" (click)="copiar(nueva.apiKey)">{{ copiado() ? '¡Copiado!' : 'Copiar' }}</button>
+  </div>
+  <button class="btn btn--ghost" (click)="cerrarClaveCreada()">Ya la guardé</button>
+</section>
+}
+
+@if (error()) {
+<p class="error-msg">{{ error() }}</p>
+}
+
+<section class="card form-card ai-form">
+  <label class="label" for="nombreClave">Nombre de la key (opcional)</label>
+  <div class="ai-form__row">
+    <input id="nombreClave" class="input" type="text" placeholder="mi-integracion-production" [(ngModel)]="nombreNueva"
+      [disabled]="creando()" (keyup.enter)="crear()">
+    <button class="btn btn--primary btn--sm" (click)="crear()" [disabled]="creando()">
+      @if (creando()) { <span class="spinner"></span> Creando… } @else { + Nueva API-Key }
+    </button>
+  </div>
+  <p class="hint">Usá una key distinta por sistema o ambiente (development, staging, production).</p>
+</section>
+
+@if (cargando()) {
+
+<p class="count">Cargando tus API-Keys…</p>
+
+} @else if (claves().length === 0) {
+
+<section class="card empty">
+  <h2>Aún no tienes ninguna API-Key</h2>
+  <p>Creá una arriba para empezar a consumir el servicio de IA desde tus propios sistemas.</p>
+</section>
+
+} @else {
+
+<p class="count">{{ claves().length }} {{ claves().length === 1 ? 'API-Key' : 'API-Keys' }}</p>
+
+@for (k of claves(); track k.id) {
+<section class="db-card">
+  <div class="db-card__head" (click)="verUso(k.id)">
+    <div class="db-card__title">
+      <span class="dot" [class.dot--warn]="k.estado !== 'active'"></span>
+      <div>
+        <span class="db-card__name">{{ k.nombre }}</span>
+        <span class="db-card__meta">
+          {{ k.estado === 'active' ? 'Activa' : 'Revocada' }} · Creada {{ k.creada }}
+          @if (k.ultimoUso) { · Último uso {{ k.ultimoUso }} }
+        </span>
+      </div>
+    </div>
+    <span class="chevron" [class.chevron--open]="usoVisibleId() === k.id">▾</span>
+  </div>
+
+  @if (usoVisibleId() === k.id) {
+  <div class="db-card__body">
+    @if (uso()[k.id]; as u) {
+    <dl class="meta">
+      <div>
+        <dt>Solicitudes (24h)</dt>
+        <dd>{{ u.solicitudes }}</dd>
+      </div>
+      <div>
+        <dt>Tokens consumidos (24h)</dt>
+        <dd>{{ u.tokens }}</dd>
+      </div>
+    </dl>
+    } @else {
+    <p class="cred-info">Cargando consumo…</p>
+    }
+
+    @if (k.estado === 'active') {
+    <div class="db-actions">
+      @if (confirmandoRevocar() === k.id) {
+      <span class="confirm">
+        ¿Revocar esta API-Key? Dejará de funcionar de inmediato.
+        <button class="btn-danger" (click)="revocar(k.id)">Sí, revocar</button>
+        <button class="icon-btn" (click)="confirmandoRevocar.set(null)">Cancelar</button>
+      </span>
+      } @else {
+      <button class="icon-btn icon-btn--danger" (click)="confirmandoRevocar.set(k.id)">Revocar API-Key</button>
+      }
+    </div>
+    }
+  </div>
+  }
+</section>
+}
+}
+
+<section class="card ai-usage-info">
+  <h2 class="card__title">Cómo usarla</h2>
+  <p class="cred-info">
+    Esta key es para tus propios sistemas — nunca la uses desde el navegador ni la subas a un repositorio.
+    Enviala en el header <code>X-Api-Key</code> al hacer la solicitud:
+  </p>
+  <div class="connstring">
+    <code>curl -X POST {{ '{{apiUrl}}' }}/ai/query \
+  -H "X-Api-Key: tu-api-key" \
+  -H "Content-Type: application/json" \
+  -d '&#123;"messages":[&#123;"role":"user","content":"Hola"&#125;]&#125;'</code>
+  </div>
+</section>

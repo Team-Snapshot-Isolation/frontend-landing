@@ -22,6 +22,7 @@ export class Dashboard implements OnInit {
   ngOnInit(): void {
     this.data.cargarUsuario();
     this.data.cargarBases();
+    this.data.cargarClavesIA();
   }
 
   salir(): void {

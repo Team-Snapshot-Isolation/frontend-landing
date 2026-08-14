@@ -14,6 +14,7 @@ export class Overview {
   protected usuario = this.data.usuario;
   protected servicios = this.data.servicios;
   protected bases = this.data.bases;
+  protected clavesIA = this.data.clavesIA;
 
   // Saludo según la hora del día
   protected saludo = computed(() => {
@@ -37,7 +38,10 @@ export class Overview {
         return n === 0 ? 'Sin bases creadas' : `${n} ${n === 1 ? 'base activa' : 'bases activas'}`;
       }
       case 'n8n':  return 'Workspace listo';
-      case 'ai':   return 'Disponible pronto';
+      case 'ai': {
+        const n = this.clavesIA().filter(k => k.estado === 'active').length;
+        return n === 0 ? 'Sin API-Keys creadas' : `${n} ${n === 1 ? 'API-Key activa' : 'API-Keys activas'}`;
+      }
       case 'dns':  return 'Disponible pronto';
       default:     return '';
     }

@@ -33,6 +33,19 @@ export interface BaseDatos {
   maxMb: number;
 }
 
+export interface ClaveIA {
+  id: string;
+  nombre: string;
+  estado: 'active' | 'revoked';
+  creada: string;
+  ultimoUso: string | null;
+}
+
+export interface UsoIA {
+  solicitudes: number;
+  tokens: number;
+}
+
 export interface CuentaN8n {
   estado: 'activo' | 'pendiente' | 'fallido' | 'ninguno';
   email: string;
@@ -79,7 +92,7 @@ export class DataService {
     {
       id: 'ai', nombre: 'IA como servicio',
       descripcion: 'Consume modelos de inteligencia artificial vía API con tu propia clave de acceso.',
-      icono: 'sparkles', estado: 'construccion', esNuestro: false, ruta: '/dashboard/ai',
+      icono: 'sparkles', estado: 'activo', esNuestro: false, ruta: '/dashboard/ai',
       proveedor: 'Integración entre equipos',
       caracteristicas: [
         'Genera tu propia API-Key desde el panel',
@@ -226,6 +239,50 @@ export class DataService {
     const d = new Date(iso);
     return isNaN(d.getTime()) ? '—'
       : d.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
+  // ───── IA / PolyService (real, desde /ai/keys) ─────
+  clavesIA = signal<ClaveIA[]>([]);
+  clavesIACargando = signal(true);
+  claveIACreada = signal<{ id: string; apiKey: string } | null>(null);
+  usoIA = signal<Record<string, UsoIA>>({});
+
+  cargarClavesIA(): void {
+    this.clavesIACargando.set(true);
+    this.http.get<any[]>(`${environment.apiUrl}/ai/keys`).subscribe({
+      next: (lista) => {
+        this.clavesIA.set((lista ?? []).map(k => this.mapearClaveIA(k)));
+        this.clavesIACargando.set(false);
+      },
+      error: () => {
+        this.clavesIA.set([]);
+        this.clavesIACargando.set(false);
+      },
+    });
+  }
+
+  cargarUsoClaveIA(id: string): void {
+    this.http.get<any>(`${environment.apiUrl}/ai/keys/${id}/usage`).subscribe({
+      next: (r) => this.usoIA.update(mapa => ({
+        ...mapa,
+        [id]: { solicitudes: Number(r?.requests_last_24h ?? 0), tokens: Number(r?.total_tokens_last_24h ?? 0) },
+      })),
+      error: () => { },
+    });
+  }
+
+  limpiarClaveIACreada(): void {
+    this.claveIACreada.set(null);
+  }
+
+  private mapearClaveIA(r: any): ClaveIA {
+    return {
+      id: String(r?.id ?? ''),
+      nombre: r?.name || 'Sin nombre',
+      estado: r?.status === 'revoked' ? 'revoked' : 'active',
+      creada: this.fecha(r?.created_at ?? ''),
+      ultimoUso: r?.last_used_at ? this.fecha(r.last_used_at) : null,
+    };
   }
 
   // ───── Logs: TODAVÍA DE EJEMPLO (falta el endpoint /auth/logins) ─────

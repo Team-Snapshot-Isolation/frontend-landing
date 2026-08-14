@@ -11,6 +11,7 @@ import { authGuard } from './core/auth.guard';
 import { NotFound } from './features/not-found/not-found';
 import { Overview } from './features/dashboard/sections/overview/overview';
 import { N8n } from './features/dashboard/sections/n8n/n8n';
+import { Ai } from './features/dashboard/sections/ai/ai';
 import { ComingSoon } from './features/dashboard/sections/coming-soon/coming-soon';
 
 export const routes: Routes = [
@@ -28,9 +29,8 @@ export const routes: Routes = [
       { path: 'account', component: Account },
       { path: 'logs', component: Logs },
       { path: 'new', component: NewDatabase },
-      // n8n, ai, dns → los agregamos en las próximas partes
-      { path: 'n8n', component: N8n },   // temporal
-      { path: 'ai', component: ComingSoon },    // temporal
+      { path: 'n8n', component: N8n },
+      { path: 'ai', component: Ai },
       { path: 'dns', component: ComingSoon },   // temporal
     ],
   },
